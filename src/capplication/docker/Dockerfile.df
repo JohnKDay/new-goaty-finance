@@ -1,0 +1,53 @@
+FROM ubuntu:18.04 as target
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
+    software-properties-common build-essential g++ libulfius-dev \
+    libmicrohttpd-dev libpq-dev
+ADD main.c /app/
+WORKDIR /app
+EXPOSE 8080
+RUN gcc -o capplication main.c -lulfius -I/usr/include/postgresql -lpq -std=c99
+CMD ["/app/capplication"]
+
+
+# export APP_IMAGE=distro-with-glibc-2.17-or-greater:myapp
+# docker build -t ${APP_IMAGE}-df -f Dockerfile.glibc.df
+#   --build-arg "APP_IMAGE=${APP_IMAGE}" --build-arg "DF_APP_NAME=${DF_APP_NAME}"--build-arg "DF_COMPONENT=${DF_COMPONENT}" .
+
+FROM centos:7 as df-runtime
+
+RUN yum -y update; yum -y install curl
+RUN cd /etc/yum.repos.d && curl -LO https://repo.deepfactor.io/repo/yum/deepfactor.repo
+RUN rpm --import https://repo.deepfactor.io/repo/yum/keys/D5DC8225.asc
+RUN yum -y install deepfactor-runtime-1.0-459
+
+ARG DF_APP_NAME
+ARG DF_COMPONENT
+ARG DF_API_TOKEN
+
+# option: pass via build ARG or set here
+ENV DF_APP "${DF_APP_NAME}"
+ENV DF_COMPONENT "${DF_COMPONENT}"
+ENV DF_API_TOKEN "${DF_API_TOKEN}"
+
+RUN echo "Building the DF name ${DF_APP_NAME}}"
+RUN echo "Building the DF component ${DF_COMPONENT}"
+RUN echo "API TOKEN: ${DF_API_TOKEN}"
+
+# If necessary, add --add-host=my-df-portal:10.0.0.1 to your image build AND run commands for DF portal DNS:
+RUN dfctl register -a "$DF_APP" -c "$DF_COMPONENT" -o /usr/lib/libdf.so -v
+# option: dfctl register/create individual components in container
+
+# Warning: The above df-runtime container's built libdf.so install must match
+#  the version of the target container's libc.so.
+#  i.e. APP_IMAGE must contain a glibc >= 2.17
+FROM target
+COPY --from=df-runtime /usr/lib/libdf.so /usr/lib/libdf.so
+
+
+# The following is an optional smoke test for redhat and debian distro types.
+RUN env LD_PRELOAD=/usr/lib/libdf.so sh -c 'rpm -q glibc || dpkg -l libc6' || \
+    (echo -e "\n\n\nError, DeepFactor dependency not met.\n\n\n/tmp/deepfactor.log:\n" \
+    && cat /tmp/deepfactor.log && false)
+
+# option: set LD_PRELOAD in app startup cmd or script
+ENV LD_PRELOAD=/usr/lib/libdf.so

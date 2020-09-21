@@ -1,0 +1,41 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: capplication
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: capplication
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capplication
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: capplication
+  revisionHistoryLimit: 1
+  template:
+    metadata:
+      labels:
+        app: capplication
+    spec:
+      containers:
+        - name: capplication
+          image: capplication
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "300Mi"
+          env:
+            - name: PORT
+              value: "8080"

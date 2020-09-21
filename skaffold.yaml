@@ -1,0 +1,65 @@
+apiVersion: skaffold/v2beta7
+kind: Config
+metadata:
+  name: new-goaty-finance
+build:
+  artifacts:
+    - image: capplication
+      context: src/capplication/docker
+      docker:
+    #        dockerfile: Dockerfile
+    - image: postgresql
+      context: src/postgresql/docker
+    - image: webappreact
+      context: src/webappreact/docker
+deploy:
+  kubectl:
+    manifests:
+      - ./kubernetes-manifests/**.yaml
+profiles:
+  - name: df
+    activation:
+      - env: DF_API_TOKEN="!"
+    patches:
+      - op: add
+        path: /build/artifacts/0/docker
+        value:
+          {
+            "buildArgs":
+              {
+                "DF_APP_NAME": "goaty-finance",
+                "DF_COMPONENT": "capplication",
+                "DF_API_TOKEN": "{{ .DF_API_TOKEN }}",
+              },
+            "dockerfile": "Dockerfile.df",
+          }
+      - op: add
+        path: /build/artifacts/1/docker
+        value:
+          {
+            "buildArgs":
+              {
+                "DF_APP_NAME": "goaty-finance",
+                "DF_COMPONENT": "postgresql",
+                "DF_API_TOKEN": "{{ .DF_API_TOKEN }}",
+              },
+            "dockerfile": "Dockerfile.df",
+          }
+      - op: add
+        path: /build/artifacts/2/docker
+        value:
+          {
+            "buildArgs":
+              {
+                "DF_APP_NAME": "goaty-finance",
+                "DF_COMPONENT": "webappreact",
+                "DF_API_TOKEN": "{{ .DF_API_TOKEN }}",
+              },
+            "dockerfile": "Dockerfile.df",
+          }
+portForward:
+- resourceType: deployment
+  resourceName: webappreact
+  port: 3000 
+  address: 0.0.0.0
+
