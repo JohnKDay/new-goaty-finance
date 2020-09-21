@@ -7,7 +7,6 @@ An example application in a Kuberentes CI setting to demonstrate the capabilitie
 - [Prerequisites](#Prerequisites)
 - [Usage](#usage)
 - [Support](#support)
-- [Contributing](#contributing)
 
 ---
 
@@ -22,7 +21,7 @@ An example application in a Kuberentes CI setting to demonstrate the capabilitie
 
 To deploy the application with DeepFactor instrumentation you will also need:
 
-- Registred an account with [Deepfactor](https://my.deepfactor.io/register)
+- Registred account with [Deepfactor](https://my.deepfactor.io/register)
 - Deployed a DeepFactor portal in [VMware](https://docs.deepfactor.io/hc/en-us/articles/360052676033-How-to-Install-DeepFactor-on-VMware-ESXi) or [AWS](https://docs.deepfactor.io/hc/en-us/articles/360052479194--Installing-DeepFactor-Using-an-AWS-CloudFormation-Template)
 
 ---
@@ -40,7 +39,7 @@ This will build, push images and deploy the goaty-finance application to the Kub
 
 - Extract and export the DF_ENV_TOKEN found in your DeepFactor portal instance
   (e.g. `Step 2 Set your auth token` from ADD APPLICTION USING TERMINAL for DEB based distrubtions)
-- skaffold run -p df -d <repository>
+- `skaffold run -p df -d <repository>`
 
 ## Support
 
