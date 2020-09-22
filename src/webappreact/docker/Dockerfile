@@ -1,11 +1,10 @@
-FROM node:8 as sealer
+FROM node:8
 
 #RUN apt-get update && apt-get upgrade -y && apt-get install -y gnupg wget nodejs npm
 
 ARG REACT_APP_QUANDL_KEY
 ENV REACT_APP_QUANDL_KEY ${REACT_APP_QUANDL_KEY}
-ARG REACT_APP_WEB_SERVER
-ENV REACT_APP_WEB_SERVER ${REACT_APP_WEB_SERVER}
+RUN /bin/bash -c 'if [ -z "${REACT_APP_QUANDL_KEY}" ]; then echo Environment variable REACT_APP_QUANDL_KEY must be specified. Exiting.; exit 1; fi'
 
 ADD server /app/server
 ADD public /app/public

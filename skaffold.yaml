@@ -7,11 +7,13 @@ build:
     - image: capplication
       context: src/capplication/docker
       docker:
-    #        dockerfile: Dockerfile
     - image: postgresql
       context: src/postgresql/docker
     - image: webappreact
       context: src/webappreact/docker
+      docker:
+        buildArgs:
+          "REACT_APP_QUANDL_KEY": "{{ .REACT_APP_QUANDL_KEY }}"
 deploy:
   kubectl:
     manifests:
@@ -54,12 +56,12 @@ profiles:
                 "DF_APP_NAME": "goaty-finance",
                 "DF_COMPONENT": "webappreact",
                 "DF_API_TOKEN": "{{ .DF_API_TOKEN }}",
+                "REACT_APP_QUANDL_KEY": "{{ .REACT_APP_QUANDL_KEY }}",
               },
             "dockerfile": "Dockerfile.df",
           }
 portForward:
-- resourceType: deployment
-  resourceName: webappreact
-  port: 3000 
-  address: 0.0.0.0
-
+  - resourceType: deployment
+    resourceName: webappreact
+    port: 3000
+    address: 0.0.0.0
