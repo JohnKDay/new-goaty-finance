@@ -4,7 +4,11 @@ FROM node:8
 
 ARG REACT_APP_QUANDL_KEY
 ENV REACT_APP_QUANDL_KEY ${REACT_APP_QUANDL_KEY}
-RUN /bin/bash -c 'if [ -z "${REACT_APP_QUANDL_KEY}" ]; then echo Environment variable REACT_APP_QUANDL_KEY must be specified. Exiting.; exit 1; fi'
+RUN if [ "${REACT_APP_QUANDL_KEY}" = "<no value>" ]; then \
+    echo "Environment variable REACT_APP_QUANDL_KEY must be specified. Exiting."; \
+    exit 40; \
+    fi
+
 
 ADD server /app/server
 ADD public /app/public
