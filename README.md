@@ -18,10 +18,11 @@ An example application in a Kuberentes CI setting to demonstrate the capabilitie
   - [skaffold binary](https://skaffold.dev/docs/install/)
 - A container registry with ability to push images from referenced Linux machine above
 - Access to a kubernetes cluster (local or remote)
+- A [Quandl API key](https://docs.quandl.com/docs#section-authentication) for stock ticker lookup.
 
 To deploy the application with DeepFactor instrumentation you will also need:
 
-- Registred account with [Deepfactor](https://my.deepfactor.io/register)
+- Registred account with [DeepFactor](https://my.deepfactor.io/register)
 - Deployed a DeepFactor portal in [VMware](https://docs.deepfactor.io/hc/en-us/articles/360052676033-How-to-Install-DeepFactor-on-VMware-ESXi) or [AWS](https://docs.deepfactor.io/hc/en-us/articles/360052479194--Installing-DeepFactor-Using-an-AWS-CloudFormation-Template)
 
 ---
@@ -31,7 +32,13 @@ To deploy the application with DeepFactor instrumentation you will also need:
 ### To deploy without DeepFactor instrumentation:
 
 - `cd` into the cloned repository (e.g. `cd goaty-finance`)
-- `skaffold run -d <repository>`
+- Export the QUANDL API key you obtained as REACT_APP_QUANDL_KEY
+
+  `export REACT_APP_QUANDL_KEY="B0GUSK3Y1NF0"`
+
+- Build and deploy the Goaty-finance appliction
+
+  `skaffold run -d <repository>`
 
 This will build, push images and deploy the goaty-finance application to the Kubnerntes cluster.
 
