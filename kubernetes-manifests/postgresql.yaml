@@ -102,11 +102,16 @@ spec:
             - name: tcp-postgresql
               containerPort: 5432
           volumeMounts:
+            - name: custom-init-scripts
+              mountPath: /docker-entrypoint-initdb.d/
             - name: dshm
               mountPath: /dev/shm
             - name: data
               mountPath: /bitnami/postgresql
       volumes:
+        - name: custom-init-scripts
+          configMap:
+            name: postgresql-init-scripts
         - name: dshm
           emptyDir:
             medium: Memory
@@ -120,3 +125,19 @@ spec:
         resources:
           requests:
             storage: "8Gi"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-init-scripts
+  labels:
+    app.kubernetes.io/name: postgresql
+    helm.sh/chart: postgresql-9.7.2
+    app.kubernetes.io/instance: postgresql
+    app.kubernetes.io/managed-by: Helm
+data:
+  setup.sql: |
+    CREATE DATABASE stocksdb;
+    \connect stocksdb
+    CREATE TABLE stocks (ticker varchar(10));
+    INSERT INTO stocks (ticker) VALUES ('TSLA');
