@@ -29,6 +29,15 @@ To deploy the application with DeepFactor instrumentation you will also need:
 
 ## Usage
 
+### Instrument and deploy existing goaty-apps containers 
+- `cd` into the cloned repository (e.g. `cd goaty-finance`)  
+- Login into the DeepFactor Portal, download and replace `Dockerfile.alpine.df` and `Dockerfile.glibc.df`. 
+- Run the `DFinstrument.sh [source] [destination]` command to instrument the container images.
+- If the destination registry server was different than `localhost:32000` edit the `K8s-goaty-finance-instrumented.yaml` file and edit the "image:" locations.
+- Deploy the goaty-apps appliction by running `kubectl apply -f K8s-goaty-finance-instrumented.yaml` command.
+- Instrumented results will begin to show up in the DeepFactor Portal
+ 
+
 ### To deploy without DeepFactor instrumentation:
 
 - `cd` into the cloned repository (e.g. `cd goaty-finance`)
@@ -42,10 +51,13 @@ To deploy the application with DeepFactor instrumentation you will also need:
 
 This will build, push images and deploy the goaty-finance application to the Kubnerntes cluster.
 
+
+### OLD METHOD
 ### To deploy with DeepFactor instumenation
 
 - Extract and export the DF_ENV_TOKEN found in your DeepFactor portal instance
   (e.g. `Step 2 Set your auth token` from ADD APPLICTION USING TERMINAL for DEB based distrubtions)
+- Modify the Dockerfile.df found in each appliction directory using the `Dockerfile.alpine.df` and `Dockerfile.glibc.df` as a guide.
 - `skaffold run -p df -d <repository>`
 
 ## Support

@@ -1,0 +1,225 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: capplication
+  namespace: default
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: capplication
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: capplication
+  namespace: default
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: capplication
+  template:
+    metadata:
+      labels:
+        app: capplication
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "8080"
+        image: localhost:32000/capplication:df-latest
+        imagePullPolicy: Always
+        name: capplication
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 200m
+            memory: 300Mi
+---
+apiVersion: v1
+data:
+  postgresql-password: Z1JBSEJ3UGpSOA==
+kind: Secret
+metadata:
+  labels:
+    app: postgresql
+  name: postgresql
+  namespace: default
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: postgresql
+  name: postgresql-headless
+  namespace: default
+spec:
+  clusterIP: None
+  ports:
+  - name: tcp-postgresql
+    port: 5432
+    targetPort: tcp-postgresql
+  selector:
+    app: postgresql
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: postgresql
+  name: postgresql
+  namespace: default
+spec:
+  ports:
+  - name: tcp-postgresql
+    port: 5432
+    targetPort: tcp-postgresql
+  selector:
+    app: postgresql
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: postgresql
+  name: postgresql
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  serviceName: postgresql-headless
+  template:
+    metadata:
+      labels:
+        app: postgresql
+      name: postgresql
+    spec:
+      containers:
+      - env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: POSTGRESQL_PORT_NUMBER
+          value: "5432"
+        - name: POSTGRESQL_VOLUME_DIR
+          value: /bitnami/postgresql
+        - name: PGDATA
+          value: /bitnami/postgresql/data
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: postgresql-password
+              name: postgresql
+        - name: POSTGRESQL_ENABLE_LDAP
+          value: "no"
+        image: localhost:32000/postgresql:df-latest
+        imagePullPolicy: Always
+        name: postgresql
+        ports:
+        - containerPort: 5432
+          name: tcp-postgresql
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        securityContext:
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /docker-entrypoint-initdb.d/
+          name: custom-init-scripts
+        - mountPath: /dev/shm
+          name: dshm
+        - mountPath: /bitnami/postgresql
+          name: data
+      hostNetwork: true
+      securityContext:
+        fsGroup: 1001
+      volumes:
+      - configMap:
+          name: postgresql-init-scripts
+        name: custom-init-scripts
+      - emptyDir:
+          medium: Memory
+          sizeLimit: 1Gi
+        name: dshm
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+---
+apiVersion: v1
+data:
+  setup.sql: |
+    CREATE DATABASE stocksdb;
+    \connect stocksdb
+    CREATE TABLE stocks (ticker varchar(10));
+    INSERT INTO stocks (ticker) VALUES ('TSLA');
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: postgresql
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: postgresql
+    helm.sh/chart: postgresql-9.7.2
+  name: postgresql-init-scripts
+  namespace: default
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webappreact
+  namespace: default
+spec:
+  ports:
+  - port: 8000
+    targetPort: 3000
+  selector:
+    app: webappreact
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webappreact
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webappreact
+  template:
+    metadata:
+      labels:
+        app: webappreact
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "3000"
+        image: localhost:32000/webappreact:df-latest
+        imagePullPolicy: Always
+        name: webappreact
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            cpu: 200m
+            memory: 300Mi

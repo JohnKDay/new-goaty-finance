@@ -1,0 +1,49 @@
+### REPLACE THIS FILE WITH your own Dockerfile.alpine.df from DF Portal
+###
+###--------------------------------------------------------------------
+
+ARG APP_IMAGE
+
+FROM alpine:3.11.5 as df-runtime
+
+
+RUN cd /etc/apk/keys && wget https://repo.deepfactor.io/repo/alpine/keys/dfbuild@deepfactor.io-5f35ef3a.rsa.pub
+RUN echo "https://repo.deepfactor.io/repo/alpine" >> /etc/apk/repositories
+RUN apk add deepfactor-runtime=1.2-r530
+
+ARG APP_IMAGE
+ARG DF_APP_NAME
+ARG DF_COMPONENT
+ENV DF_API_TOKEN=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiJkBOGUSY0YS1lYzZjLTQ2ZTgtOTg2OS0xZDIxMjBkOGFjMjQiLCJ0b2tlbmlkIjoiNDBhYzIzZGYtMDY2YS00ZGI1LWJlNjItZmQwNTQyYTYyZDdiIiwic3ViZG9tYWluIjoiZGYiLCJjdXN0b21lcmlkIjoiYTYzMWQzNDctMDM0My00MmEzLTg4M2MtZTNiYWY2M2FlYmM0IiwidXNlcmxldmVsIjoiQ1VTVE9NRVIiLCJyb2xlaWQiOiI2MGRmMDIzMS0wYjE2LTQyMDItYTQzYS0zYjliYmI5NzJjYWYiLCJyb2xlbmFtZSI6IkNfQURNSU4iLCJ0b2tlbl90eXBlIjoiREZfQVBJX1RPS0VOIiwiZXhwIjoxNjM3MDM1MDQ5LCJpYXQiOjE2MDU0OTkwNDksIm5iZiI6MTYwNTQ5OTA0OSwicG9ydGFsVVJMIjoiZGZwLmxvY2FsLmluYWRlbW8uY29tIiwiY3VzdG9tZXJQb3J0YWxVUkwiOiJkZi5kZnAubG9jYWwuaW5hZGVtby5jb20iLCJwb3J0YWxDQSI6Ik1JSUZ3RENDQTZpZ0F3SUJBZ0lVZlhNUW1LWDFkRFFmdDhZNGtVRUlrSm5OQTRFd0RRWUpLb1pJaHZjTkFRRUxcbkJRQXdhVEVMTUFrR0ExVUVCaE1DVlZNeEV6QVJCZ05WQkFnTUNrTmhiR2xtYjNKdWFXRXhFVEFQQmdOVkJBY01cbkNGTmhiaUJLYjNObE1STXdFUVlEVlFRS0RBcEVaV1Z3Um1GamRHOXlNUjB3R3dZRFZRUUREQlJFWldWd1JtRmpcbmRHOXlJRkJ2Y25SaGJDQkRRVEFlRncweU1ERXhNVFF4TnpRMU1USmFGdzB6TURFeE1USXhOelExTVRKYU1Ha3hcbkN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUlEQXBEWVd4cFptOXlibWxoTVJFd0R3WURWUVFIREFoVFlXNGdcblNtOXpaVEVUTUJFR0ExVUVDZ3dLUkdWbGNFWmhZM1J2Y2pFZE1Cc0dBMVVFQXd3VVJHVmxjRVpoWTNSdmNpQlFcbmIzSjBZV3dnUTBFd2dnSWlNQTBHQ1NxR1NJYjNEUUVCQVFVQUE0SUNEd0F3Z2dJS0FvSUNBUURlcWt3V2F5VFhcbjVSMmRudnVpM0xRSGF0bW9sczJ3b0hYdUdVd2JyL1RDdGxBanJmaElPYnkrQ3dQK3hockUxMFloZlYyMW01UjJcblJMTC8vbGhWbnZOa0dnUWRsRkZ5MHF3eFJ0MHdvUXVSR1R0OGE5LzNrdGpoRlVsbmNsc09ZbjYzVTgvOFBvM0VcbnlWeHBydERPME1QeFFiUFh2Nk5uL2lRZXVSK0Zua2dDSGJDaUsvVjdsNjRsM0lXZDVLVkFseTRXb1ZLcDJHdlFcbmZqaUxwMDJwenZkclcrdVE2d0hSV1lYd2NVeGE2MkZQa1dNK2FyL0srdmMxMGxDajgxWk5XRlVPRGlaQUxvQS9cblA3ZmdDYWd3dytuM2NCeDFhR09WdWhoVitRNXVWVW9FNkxuRDJZK2NXVzBnYU9QMFo5bW1QNEV3bEU3ajlrVmdcbmJScVpPS3dNVWR0L0JaTVlEUStuV0JUbE1SNXBIN2pMZkNJYkR5bFJ0dWdWejczU2lQTDhGcEFCZVBGL0Y1ZEFcbmp0Q2RWSUx0WlNXbklpOXNGM1p2alpLaTMzcVQ1aFk2aUJaRWZZdnpMVFNaOWl1QXg3aWRCNVN1czZjSnUzY0dcbmdTVnBhZzN4ZVBVMFlmNEE4NTFYMDZuUTRDTXFBRElZVCtmamhyeWpneU1JWXhZSGlDNTFJUWRQb0pRMVBhMGdcbjNPZFpkdytHTDRQSC9HYzRSRk11blhMM29ZcFpFc01BK1BqVXFhQ0twSGt1c0Vaa2xPRFg3dlpTVllqNU1qUHlcbkJMYUV3bVJ3K21jYTZtc1pKekVSc3Z2RXlrNWFsc0YvM3h1TmtCZy8zb05kZVRQRzh0OTEzemRBWkFVc0l3R3JcblU4UTViNjlUNVg2VmxMRENHVFJuRkJ6K1hXblVPTU5CSHdJREFRQUJvMkF3WGpBZEJnTlZIUTRFRmdRVTkySW5cbmJ2YXdoTVBCOHJVRDFsTUtqZnpUUEFzd0h3WURWUjBqQkJnd0ZvQVU5MkluYnZhd2hNUEI4clVEMWxNS2pmelRcblBBc3dEd1lEVlIwVEFRSC9CQVV3QXdFQi96QUxCZ05WSFE4RUJBTUNBUVl3RFFZSktvWklodmNOQVFFTEJRQURcbmdnSUJBQmJlVlpibzdZeDZEYjJ2eXpMamd5NmNDUUQvQnc4RmZhSUdTOG5iOTN5RkVBYTNEZUUxUFJLRGZDWG9cbkxCZXk5N3paOHhqUnlrL0JaYnA1dVRJM0ZmdWpxNmNHY0lMckRyN1duOFR6a2owSnlLbzdVVSs4OFgwQmJta3VcbmdHL0FHbW56WVhieGREK3RQcnNMWHBhUWxmcmladENvQ3B3QnFTbU5COFFBUEg1WmxBRWN3clZ0a2IvT1VNWEpcbkp0L2c0SFp3TElFeFgybmZBZktmTFJMbWNIdnJzWVlSR3BIbEgrQ01wMWI2OGp2c2wzVXFkSHB3N2Zoejk1bFlcbnNmYzduR2RFdlNSOVBMMGg4ayttV2ZWOFVTdDM1K3JPVlhRMWZsWlBLaHBNRytNWVluNzBmQkdKenpDWlNmYzlcbmgrd2trTnJoc3RLMWdSSkRHblVjeXNWYWFSL1U0VUZucmJsS0NwWlZta21JMkd4OGMrak96bi9WK25teVVZRStcblM2RDBHUTkxMldScVpmOE52RUNkeHZuR3NEMTFJV2wvbnhuZTRVVXhYbWdoREFmanhQKzVGTXdCdFpHZ2k0d3RcbkxubDJ3UU9vQmNIUkhVd2ZCeWdTVGFQK2dHandDVE1XR3c4NXZXdk1XZEFjTGUrTmFJVzJxWGU1VmRnWG5MT2pcbkNXaFU4NWdMZ2cxamNCcUE3ekoxWXRjQi9tN1lEL0FrTWV5OWVoOEp3dDlvT084YkZmUlQ0d1A4MXVQRFB5TFVcbmNuN3EzQ0YwNjAwSHlodWlvVnBsTVV0Mm9HYXh1akR3NlF4a1Q2STdvQ28rZk9Dc3VBSFprSUx0UTMxVEQ1RllcbjhhSUpOWWg2a2pEU0xGM0dKU292TGZhZ2k4Q0VZSDNKWEVVa0hoVjBIVW03M1d3UCJ9.NNIPyB6hi_1uCjTRV8tVVjr5BQP7x6C_4qWjsk86p-w
+
+# option: pass via build ARG or set here
+ENV DF_APP "${DF_APP_NAME}"
+ENV DF_COMPONENT "${DF_COMPONENT}"
+
+# If necessary, add --add-host=my-df-portal:10.0.0.1 to your image build AND run commands for DF portal DNS:
+RUN mkdir -p /opt/deepfactor/manifest
+RUN dfctl register -a "$DF_APP" -c "$DF_COMPONENT" -o /opt/deepfactor/manifest/df-manifest.json -v
+# option: dfctl register/create individual components in container
+
+# Warning: The above df-runtime container's built libdf.so install must match
+#  the version of the target container's libc.so.
+#  i.e. APP_IMAGE must contain a musl libc
+FROM ${APP_IMAGE}
+# Add runtime dependencies
+RUN IMG_USER=`id -u`
+USER root
+RUN apk add libstdc++ libexecinfo
+RUN mkdir -p /opt/deepfactor/manifest
+USER ${IMG_USER}
+COPY --from=df-runtime /usr/lib/libdf.so /usr/lib/libdf.so
+COPY --from=df-runtime /opt/deepfactor/manifest/df-manifest.json /opt/deepfactor/manifest/df-manifest.json
+
+
+# The following is an optional smoke test for redhat and debian distro types.
+RUN env LD_PRELOAD=/usr/lib/libdf.so DF_MANIFEST=/opt/deepfactor/manifest/df-manifest.json sh -c 'apk list > /dev/null' || \
+    (echo -e "\n\n\nError, DeepFactor dependency not met.\n\n\n/tmp/deepfactor.log:\n" \
+    && cat /tmp/deepfactor.log && false)
+
+# option: set LD_PRELOAD in app startup cmd or script
+ENV LD_PRELOAD=/usr/lib/libdf.so
+ENV DF_MANIFEST=/opt/deepfactor/manifest/df-manifest.json

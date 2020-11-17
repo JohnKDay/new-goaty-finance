@@ -14,6 +14,12 @@ build:
       docker:
         buildArgs:
           "REACT_APP_QUANDL_KEY": "{{ .REACT_APP_QUANDL_KEY }}"
+
+  tagPolicy:
+    envTemplate:
+      template: nodf-latest
+  local:
+    useBuildkit: true
 deploy:
   kubectl:
     manifests:
